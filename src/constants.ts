@@ -1,4 +1,4 @@
-export const rpcUrl: string = 'http://3.12.186.200:3545';
+export const rpcUrl: string = 'https://rpc-bitgert-vefi.com';
 export const redisLastProcessedBlockKey: string = 'redis:sequencer:last:block:processed';
 export const redisBlocksKey: string = 'redis:sequencer:blocks';
 export const redisTokensKey: string = 'redis:sequencer:tokens';
