@@ -41,6 +41,22 @@ router.get('/transactions', async (req, res) => {
   }
 });
 
+router.get('/transactions/:address', async (req, res) => {
+  try {
+    const blocksKeyExists = await checkIfItemExists(redisBlocksKey);
+    let result = blocksKeyExists ? JSON.parse((await getItem(redisBlocksKey)) as string) : [];
+    let transactions: any[] = [];
+
+    for (const block of result) transactions = [...transactions, ...block.transactions];
+
+    transactions = transactions.filter(txn => txn.from === req.params.address || txn.to === req.params.address);
+    result = transactions;
+    return res.status(200).json({ result });
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 router.get('/tokens', async (req, res) => {
   try {
     const allRedisKeys = await getAllKeys();
