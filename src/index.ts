@@ -10,29 +10,6 @@ const port = parseInt(process.env.PORT || '8006');
 
 const router = Router();
 
-async function temporaryFunction() {
-  const blocks = JSON.parse((await getItem(redisBlocksKey)) as string);
-
-  for (const block of blocks) {
-    log(`${block.number}`);
-    for (const tx of block.transactions) {
-      const transactionsKeyExists = await checkIfItemExists(redisTransactionsKey);
-
-      if (transactionsKeyExists) {
-        let transactions: any = await getItem(redisTransactionsKey);
-        transactions = JSON.parse(transactions);
-        transactions = transactions.map((txn: any) => txn.hash).includes(tx.hash)
-          ? [...transactions]
-          : [...transactions, tx];
-
-        await cacheItem(redisTransactionsKey, JSON.stringify(transactions));
-      } else {
-        await cacheItem(redisTransactionsKey, JSON.stringify([tx]));
-      }
-    }
-  }
-}
-
 router.get('/', (req, res) => {
   return res.status(200).json({
     message: 'Hello there!'
@@ -99,7 +76,6 @@ app.use('/', router);
 app.listen(port, async () => {
   log('App running on %d', port);
   await initConnection();
-  await temporaryFunction();
   watchBlockChanges();
   await processPreviousBlocks();
 });
