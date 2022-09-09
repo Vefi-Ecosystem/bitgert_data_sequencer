@@ -8,6 +8,7 @@ import {
   redisLastProcessedBlockKey,
   redisTokensKey,
   redisTokensBalanceRecordKey,
+  redisTransactionsKey,
   rpcUrl
 } from './constants';
 import request from './utils/rpc';
@@ -31,6 +32,20 @@ async function processBlock(blockNumber: string) {
       for (const tx of block.transactions) {
         const addressCode = await request('eth_getCode', [tx.to, 'latest']);
         const isContract = addressCode !== '0x' && addressCode !== '0x0';
+
+        const transactionsKeyExists = await checkIfItemExists(redisTransactionsKey);
+
+        if (transactionsKeyExists) {
+          let transactions: any = await getItem(redisTransactionsKey);
+          transactions = JSON.parse(transactions);
+          transactions = transactions.map((txn: any) => txn.hash).includes(tx.hash)
+            ? [...transactions]
+            : [...transactions, tx];
+
+          await cacheItem(redisTransactionsKey, JSON.stringify(transactions));
+        } else {
+          await cacheItem(redisTransactionsKey, JSON.stringify([tx]));
+        }
 
         if (isContract) {
           const abiInterface = new Interface(erc20Abi);
