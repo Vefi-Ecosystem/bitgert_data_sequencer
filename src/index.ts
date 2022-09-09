@@ -23,7 +23,7 @@ router.get('/blocks', async (req, res) => {
     result = result.sort((a: any, b: any) => parseInt(a.number) - parseInt(b.number));
     result = {
       items: req.query.page
-        ? result.slice((parseInt(req.query.page as string) - 1) * result.length, result.length)
+        ? result.slice((parseInt(req.query.page as string) - 1) * 25, parseInt(req.query.page as string) * 25)
         : result.slice(result.length > 25 ? result.length - 25 : 0, result.length),
       size: result.length
     };
@@ -40,7 +40,7 @@ router.get('/transactions', async (req, res) => {
     result = result.sort((a: any, b: any) => parseInt(a.blockNumber) - parseInt(b.blockNumber));
     result = {
       items: req.query.page
-        ? result.slice((parseInt(req.query.page as string) - 1) * result.length, result.length)
+        ? result.slice((parseInt(req.query.page as string) - 1) * 25, parseInt(req.query.page as string) * 25)
         : result.slice(result.length > 25 ? result.length - 25 : 0, result.length),
       size: result.length
     };
@@ -59,12 +59,12 @@ router.get('/transactions/:address', async (req, res) => {
       .filter((txn: any) => txn.from === req.params.address || txn.to === req.params.address)
       .sort((a: any, b: any) => parseInt(b.blockNumber) - parseInt(a.blockNumber));
 
-    result = {
-      items: req.query.page
-        ? result.slice((parseInt(req.query.page as string) - 1) * result.length, result.length)
-        : result.slice(result.length > 25 ? result.length - 25 : 0, result.length),
-      size: result.length
-    };
+      result = {
+        items: req.query.page
+          ? result.slice((parseInt(req.query.page as string) - 1) * 25, parseInt(req.query.page as string) * 25)
+          : result.slice(result.length > 25 ? result.length - 25 : 0, result.length),
+        size: result.length
+      };
     return res.status(200).json({ result });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
@@ -75,12 +75,19 @@ router.get('/tokens', async (req, res) => {
   try {
     const allRedisKeys = await getAllKeys();
     const filteredKeys = allRedisKeys.filter(key => key.startsWith(redisTokensKey));
-    let result: any[] = [];
+    let result: any = [];
 
     for (const key of filteredKeys) {
       const token = await getItem(key);
       result = [...result, JSON.parse(token as string)];
     }
+
+    result = {
+      items: req.query.page
+        ? result.slice((parseInt(req.query.page as string) - 1) * 25, parseInt(req.query.page as string) * 25)
+        : result.slice(result.length > 25 ? result.length - 25 : 0, result.length),
+      size: result.length
+    };
     return res.status(200).json({ result });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
