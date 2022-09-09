@@ -106,6 +106,19 @@ router.get('/tokens', async (req, res) => {
   }
 });
 
+router.get('/addresses/count', async (req, res) => {
+  try {
+    const transactionsKeyExists = await checkIfItemExists(redisTransactionsKey);
+    let result = transactionsKeyExists ? JSON.parse((await getItem(redisTransactionsKey)) as string) : [];
+    result = result.map((txn: any) => txn.to);
+    result = new Set<string>(result);
+    result = result.size;
+    return res.status(200).json({ result });
+  } catch (error: any) {
+    return res.status(500).json({ error: error.message });
+  }
+});
+
 app.use((req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET');
