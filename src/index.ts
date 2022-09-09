@@ -1,7 +1,7 @@
 import express, { Router } from 'express';
 import morgan from 'morgan';
 import { watchBlockChanges, processPreviousBlocks } from './_sequencing';
-import { initConnection, checkIfItemExists, getItem, getAllKeys, cacheItem } from './utils/redis';
+import { initConnection, checkIfItemExists, getItem, getAllKeys } from './utils/redis';
 import { redisBlocksKey, redisTokensKey, redisTransactionsKey } from './constants';
 import log from './log';
 
@@ -19,7 +19,8 @@ router.get('/', (req, res) => {
 router.get('/blocks', async (req, res) => {
   try {
     const blocksKeyExists = await checkIfItemExists(redisBlocksKey);
-    const result = blocksKeyExists ? JSON.parse((await getItem(redisBlocksKey)) as string) : [];
+    let result = blocksKeyExists ? JSON.parse((await getItem(redisBlocksKey)) as string) : [];
+    result = result.sort((a: any, b: any) => parseInt(a.number) - parseInt(b.number));
     return res.status(200).json({ result });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
@@ -30,6 +31,7 @@ router.get('/transactions', async (req, res) => {
   try {
     const transactionsKeyExists = await checkIfItemExists(redisTransactionsKey);
     let result = transactionsKeyExists ? JSON.parse((await getItem(redisTransactionsKey)) as string) : [];
+    result = result.sort((a: any, b: any) => parseInt(a.blockNumber) - parseInt(b.blockNumber));
     return res.status(200).json({ result });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
@@ -41,7 +43,9 @@ router.get('/transactions/:address', async (req, res) => {
     const transactionsKeyExists = await checkIfItemExists(redisTransactionsKey);
     let result = transactionsKeyExists ? JSON.parse((await getItem(redisTransactionsKey)) as string) : [];
 
-    result = result.filter((txn: any) => txn.from === req.params.address || txn.to === req.params.address);
+    result = result
+      .filter((txn: any) => txn.from === req.params.address || txn.to === req.params.address)
+      .sort((a: any, b: any) => parseInt(b.blockNumber) - parseInt(a.blockNumber));
     return res.status(200).json({ result });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
