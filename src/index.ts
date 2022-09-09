@@ -21,6 +21,7 @@ router.get('/blocks', async (req, res) => {
     const blocksKeyExists = await checkIfItemExists(redisBlocksKey);
     let result = blocksKeyExists ? JSON.parse((await getItem(redisBlocksKey)) as string) : [];
     result = result.sort((a: any, b: any) => parseInt(a.number) - parseInt(b.number));
+    result = JSON.stringify(result);
     return res.status(200).json({ result });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
@@ -32,6 +33,7 @@ router.get('/transactions', async (req, res) => {
     const transactionsKeyExists = await checkIfItemExists(redisTransactionsKey);
     let result = transactionsKeyExists ? JSON.parse((await getItem(redisTransactionsKey)) as string) : [];
     result = result.sort((a: any, b: any) => parseInt(a.blockNumber) - parseInt(b.blockNumber));
+    result = JSON.stringify(result);
     return res.status(200).json({ result });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
@@ -46,6 +48,7 @@ router.get('/transactions/:address', async (req, res) => {
     result = result
       .filter((txn: any) => txn.from === req.params.address || txn.to === req.params.address)
       .sort((a: any, b: any) => parseInt(b.blockNumber) - parseInt(a.blockNumber));
+    result = JSON.stringify(result);
     return res.status(200).json({ result });
   } catch (error: any) {
     return res.status(500).json({ error: error.message });
