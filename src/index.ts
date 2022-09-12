@@ -64,8 +64,8 @@ router.get('/transactions/:address', async (req, res) => {
     result = result
       .filter(
         (txn: any) =>
-          txn.from.toLowerCase() === req.params.address.toLowerCase() ||
-          txn.to.toLowerCase() === req.params.address.toLowerCase()
+          txn.from?.toLowerCase() === req.params.address.toLowerCase() ||
+          txn.to?.toLowerCase() === req.params.address.toLowerCase()
       )
       .sort((a: any, b: any) => parseInt(b.blockNumber) - parseInt(a.blockNumber));
 
