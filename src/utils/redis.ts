@@ -39,8 +39,11 @@ export function checkIfItemExists(key: string) {
   });
 }
 
-export function getAllKeys() {
+export function getAllKeysMatchingPattern(pattern: string) {
   return new Promise<string[]>((resolve, reject) => {
-    client.keys('*').then(resolve).catch(reject);
+    client
+      .keys(pattern + '*')
+      .then(resolve)
+      .catch(reject);
   });
 }

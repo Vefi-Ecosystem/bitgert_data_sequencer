@@ -1,7 +1,7 @@
 import express, { Router } from 'express';
 import morgan from 'morgan';
 import { watchBlockChanges, processPreviousBlocks } from './_sequencing';
-import { initConnection, checkIfItemExists, getItem, getAllKeys } from './utils/redis';
+import { initConnection, checkIfItemExists, getItem, getAllKeysMatchingPattern } from './utils/redis';
 import { redisBlocksKey, redisTokensKey, redisTransactionsKey } from './constants';
 import log from './log';
 
@@ -86,11 +86,10 @@ router.get('/transactions/:address', async (req, res) => {
 
 router.get('/tokens', async (req, res) => {
   try {
-    const allRedisKeys = await getAllKeys();
-    const filteredKeys = allRedisKeys.filter(key => key.startsWith(redisTokensKey));
+    const allRedisKeys = await getAllKeysMatchingPattern(redisTokensKey);
     let result: any = [];
 
-    for (const key of filteredKeys) {
+    for (const key of allRedisKeys) {
       const token = await getItem(key);
       result = [...result, JSON.parse(token as string)];
     }
