@@ -62,7 +62,11 @@ router.get('/transactions/:address', async (req, res) => {
     let result = transactionsKeyExists ? JSON.parse((await getItem(redisTransactionsKey)) as string) : [];
 
     result = result
-      .filter((txn: any) => txn.from === req.params.address || txn.to === req.params.address)
+      .filter(
+        (txn: any) =>
+          txn.from.toLowerCase() === req.params.address.toLowerCase() ||
+          txn.to.toLowerCase() === req.params.address.toLowerCase()
+      )
       .sort((a: any, b: any) => parseInt(b.blockNumber) - parseInt(a.blockNumber));
 
     result = {
