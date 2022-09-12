@@ -24,8 +24,8 @@ router.get('/blocks', async (req, res) => {
     result = {
       items: req.query.page
         ? result.slice(
-            (parseInt(req.query.page as string) - 1) * 25 - result.length,
-            parseInt(req.query.page as string) * 25 - result.length
+            result.length > 25 ? (parseInt(req.query.page as string) - 1) * 25 - result.length : 0,
+            result.length > 25 ? parseInt(req.query.page as string) * 25 - result.length : result.length
           )
         : result.slice(result.length > 25 ? result.length - 25 : 0, result.length),
       size: result.length
@@ -44,8 +44,8 @@ router.get('/transactions', async (req, res) => {
     result = {
       items: req.query.page
         ? result.slice(
-            (parseInt(req.query.page as string) - 1) * 25 - result.length,
-            parseInt(req.query.page as string) * 25 - result.length
+            result.length > 25 ? (parseInt(req.query.page as string) - 1) * 25 - result.length : 0,
+            result.length > 25 ? parseInt(req.query.page as string) * 25 - result.length : result.length
           )
         : result.slice(result.length > 25 ? result.length - 25 : 0, result.length),
       size: result.length
@@ -72,8 +72,8 @@ router.get('/transactions/:address', async (req, res) => {
     result = {
       items: req.query.page
         ? result.slice(
-            (parseInt(req.query.page as string) - 1) * 25 - result.length,
-            parseInt(req.query.page as string) * 25 - result.length
+            result.length > 25 ? (parseInt(req.query.page as string) - 1) * 25 - result.length : 0,
+            result.length > 25 ? parseInt(req.query.page as string) * 25 - result.length : result.length
           )
         : result.slice(result.length > 25 ? result.length - 25 : 0, result.length),
       size: result.length
@@ -97,8 +97,8 @@ router.get('/tokens', async (req, res) => {
     result = {
       items: req.query.page
         ? result.slice(
-            (parseInt(req.query.page as string) - 1) * 25 - result.length,
-            parseInt(req.query.page as string) * 25 - result.length
+            result.length > 25 ? (parseInt(req.query.page as string) - 1) * 25 - result.length : 0,
+            result.length > 25 ? parseInt(req.query.page as string) * 25 - result.length : result.length
           )
         : result.slice(result.length > 25 ? result.length - 25 : 0, result.length),
       size: result.length
