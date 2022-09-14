@@ -8,7 +8,7 @@
     "format": "prettier --write **/**/*.{js,json,ts}",
     "dev": "cross-env DEBUG=app ts-node src/index",
     "build": "tsc -p .",
-    "start": "cross-env DEBUG=app node --max-old-space-size=10000 build/index"
+    "start": "cross-env DEBUG=app node --max-old-space-size=20000 build/index"
   },
   "repository": {
     "type": "git",
